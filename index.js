@@ -24,9 +24,37 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// API endpoint to get the current timestamp
+app.get("/api", function (req, res) {
+  const date = new Date(); // Get the current date and time
+  res.json({ unix: date.getTime(), utc: date.toUTCString() }); // Return the timestamp in JSON format
+});
+
+// API endpoint to get the timestamp from a specific date string
+app.get("/api/:date_string", function (req, res) {
+  const dateString = req.params.date_string;
+  let date;
+  
+  if (!isNaN(dateString)) {
+    // If the date string is a number, treat it as a Unix timestamp
+    date = new Date(parseInt(dateString, 10));
+  }
+  else {
+    // Otherwise, treat it as a date string
+    date = new Date(dateString);
+  }
+  let unix = date.getTime(); // Get the Unix timestamp
+  if (isNaN(unix)) {
+    // If the date is invalid, return an error message
+    return res.json({ error: "Invalid Date" });
+  }
+  let utc = date.toUTCString(); // Get the UTC string
+  res.json({ unix: unix, utc: utc }); // Return the timestamp in JSON format
+});
 
 
 // Listen on port set in environment variable or default to 3000
-var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
-});
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`server is listening on port ${port}....`)
+})
